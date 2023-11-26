@@ -44,10 +44,8 @@ def get_dataset(dataset_name,
         data_sbu = data_sbu.map(lambda example: {"caption": [example["caption"]]})
         data = datasets.concatenate_datasets([data_coco, data_textcap, data_sbu])
         return CombinedDataset(data,
-                                tokenizer,
-                                transforms=transforms,
-                                image_key="image",
-                                text_key="caption")
+                               tokenizer,
+                               transforms=transforms)
     elif dataset_name == "yfcc7m":
         def prepare_data(x):
             caption = x["txt"]

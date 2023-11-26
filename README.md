@@ -14,10 +14,10 @@ Models were evaluated in zero-shot fashion, where text queries were constructed 
 
 ImageNet results surpassed the [zero-shot scaling trend](https://github.com/mlfoundations/open_clip/blob/main/docs/LOW_ACC.md), by a few points, signalling a potential for smaller but more diverse and information dense datasets. This is in line with https://arxiv.org/abs/2205.01397, where authors determined that the main contributing factor in model quality and robustness for the CLIP objective are more diverse training distribution. In other words, data quality and diversity >> data quantity.
 
-| Training Datasets           | Training steps  | Text Encoder            | Image Encoder | Eval dataset | Top1 % |
-|-----------------------------|-----------------|-------------------------|---------------|--------------|--------|
-| yfcc7m + coco + sbucaptions | 57,800          | distilbert-base-uncased | ResNet-50     | STL-10       | 93.75  |
-| yfcc7m + coco + sbucaptions | 57,800          | distilbert-base-uncased | ResNet-50     | ImageNet     | 36.47  |
+| Training Datasets           | Training steps  | Text Encoder            | Image Encoder | Eval dataset | Top1 % | Top5 % | Top10 % |
+|-----------------------------|-----------------|-------------------------|---------------|--------------|--------|--------|---------|
+| yfcc7m + coco + sbucaptions | 57,800          | distilbert-base-uncased | ResNet-50     | STL-10       | 93.75  | -      | -       |
+| yfcc7m + coco + sbucaptions | 57,800          | distilbert-base-uncased | ResNet-50     | ImageNet     | 37.10  | 63.04  | 71.70   |
 
 Trained CLIP model can be found [here](https://drive.google.com/file/d/1UnakTzwVYE0x2A6rPNaK2OhypVBOM1zI/view?usp=sharing).
 
