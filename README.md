@@ -6,6 +6,20 @@ Simple implementation of [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive L
 # CLIP
 [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive Language-Image Pretraining) by OpenAI is a model that unifies text and image understanding through a contrastive learning approach. It employs two neural networks, one for image processing and another for text processing, which are jointly trained on a large dataset of images and their corresponding textual descriptions. This training enables the model to understand and link visual content with natural language. CLIP's distinctive feature is its zero-shot learning capability, allowing it to generalize across various visual tasks without task-specific training, solely based on textual prompts. This makes it highly adaptable for diverse applications in AI, from image classification to complex visual reasoning tasks.
 
+# Results
+
+All experiments used ResNet50 and Distill BERT as respectively image and text encoders. Models were first trained on smaller datasets, such as COCO to validate the approach. Later on, they were trained on combined COCO and sbucaptions data and a yfcc7m subset.
+
+Models were evaluating in zero-shot fashion, where text queries were constructed as "a photo of {label_name}". For ImageNet, we used the 50k validation dataset.
+
+ImageNet results surpassed the [zero-shot scaling trend](https://github.com/mlfoundations/open_clip/blob/main/docs/LOW_ACC.md), by a few points, signalling a potential for smaller but more diverse and information dense datasets. This is in line with https://arxiv.org/abs/2205.01397, where authors determined that the main contributing factor in model quality and robustness for the CLIP objective are more diverse training distribution. In other words, data quality and diversity >> data quantity.
+
+| Training Datasets           | Text Encoder            | Image Encoder | Feature dim | Training steps     | Eval dataset | Top1 % |
+|-----------------------------|-------------------------|---------------|-------------|--------------------|--------------|--------|
+| yfcc7m + coco + sbucaptions | distilbert-base-uncased | ResNet-50     | 768         | 57,800             | STL-10       | 93.75  |
+| yfcc7m + coco + sbucaptions | distilbert-base-uncased | ResNet-50     | 768         | 57,800             | ImageNet     | 34.61  |
+
+
 # Usage
 
 ### Instalation
