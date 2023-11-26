@@ -1,9 +1,10 @@
 import torch
-
-from simple_clip.encoders import resnet18, resnet50, efficientnet_v2_s, TextEncoder
-from simple_clip.custom_datasets.clip_datasets import COCODataset, SBUDataset
 from transformers import DistilBertTokenizer
 import datasets
+import webdataset as wds
+
+from simple_clip.encoders import resnet18, resnet50, efficientnet_v2_s, TextEncoder
+from simple_clip.custom_datasets.clip_datasets import COCODataset, SBUDataset, CombinedDataset
 
 
 def get_dataset(dataset_name,
@@ -30,14 +31,44 @@ def get_dataset(dataset_name,
                            text_key="outputs",
                            shuffle_captions=shuffle_captions)
     elif dataset_name == "sbucaptions":
-        data = datasets.load_from_disk("data/sbu_captions_images")["train"]
+        data = datasets.load_from_disk(f"{dataset_path}/sbu_captions_images")["train"]
         return SBUDataset(data,
                           tokenizer,
                           transforms=transforms,
                           image_key="image",
                           text_key="caption")
-    raise Exception(
-        "Invalid dataset name - options are [flickr8k, coco, sbucaptions]")
+    elif dataset_name == "combined":
+        data_coco = datasets.load_from_disk(f"{dataset_path}/coco")["train"]
+        data_textcap = datasets.load_from_disk(f"{dataset_path}/textcap")["train"]
+        data_sbu = datasets.load_from_disk(f"{dataset_path}/sbu_captions_images")
+        data_sbu = data_sbu.map(lambda example: {"caption": [example["caption"]]})
+        data = datasets.concatenate_datasets([data_coco, data_textcap, data_sbu])
+        return CombinedDataset(data,
+                                tokenizer,
+                                transforms=transforms,
+                                image_key="image",
+                                text_key="caption")
+    elif dataset_name == "yfcc15m":
+        def prepare_data(x):
+            caption = x["txt"]
+            encoded_caption =  tokenizer(caption,
+                                padding="max_length",
+                                truncation=True,
+                                max_length=100)
+            image = transforms(x["jpg"])
+            
+            instance = {
+                key: torch.tensor(value)
+                for key, value in encoded_caption.items()
+            }
+            instance["image"] = image
+            
+            return instance
+        
+        dataset = wds.WebDataset([f"{dataset_path}/yfcc15m/{i:05d}.tar" for i in range(1538)], shardshuffle=True, cache_dir=f"{dataset_path}/yfcc15m_training_cache")
+        dataset = dataset.shuffle(1000, initial=100).decode("pil").map(prepare_data)
+        return dataset
+    raise Exception(f"Invalid dataset name {dataset_name} - options are [coco, sbucaptions, combined, yfcc15m]")
 
 
 def get_image_encoder(model_name):

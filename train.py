@@ -1,16 +1,17 @@
 import torch
 from torch.utils.data import DataLoader
 from torch.cuda.amp import GradScaler, autocast
-import multiprocessing
 import random
 import numpy as np
 from tqdm.auto import tqdm
 from torchinfo import summary
+import webdataset as wds
 
 from simple_clip import CLIP, clip_loss
 
 from simple_clip.utils import accuracy, get_dataset, get_image_encoder, get_text_encoder
-from simple_clip.custom_datasets.clip_datasets import get_image_tranforms, get_image_tranforms_aug
+from simple_clip.custom_datasets.clip_datasets import get_image_tranforms
+from simple_clip.imagenet_eval import ImageNetValidation
 
 SEED = 42
 
@@ -40,23 +41,25 @@ def train_clip(args):
     optimizer = torch.optim.Adam(list(model.parameters()),
                                  lr=args.learning_rate,
                                  weight_decay=args.weight_decay)
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
-                                                              mode="min",
-                                                              patience=2,
-                                                              factor=0.5)
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=60000, eta_min=1e-8)
 
     transforms_inference = get_image_tranforms(
-        (args.image_size, args.image_size))
-    transforms_train = get_image_tranforms_aug(
         (args.image_size, args.image_size))
     ds = get_dataset(args.dataset_name,
                      args.dataset_path,
                      transforms=transforms_inference)
-    train_loader = DataLoader(ds,
+    if args.dataset_name == "yfcc15m":
+        train_loader = wds.WebLoader(ds, num_workers=2, batch_size=args.batch_size)
+        # hardcoded for batch_size = 256 :/
+        steps_per_epcoch = 28630
+    else:
+        train_loader = DataLoader(ds,
                               batch_size=args.batch_size,
-                              num_workers=multiprocessing.cpu_count() - 8,
+                              num_workers=12,
                               drop_last=True,
                               shuffle=True)
+        steps_per_epcoch = len(train_loader)
+
     # Always use coco val dataset for standardization purposes
     ds_val = get_dataset("coco",
                          args.dataset_path,
@@ -66,6 +69,9 @@ def train_clip(args):
     val_loader = DataLoader(ds_val,
                             batch_size=min(args.batch_size, 256),
                             num_workers=4)
+    
+    if args.imagenet_eval:
+        imgnet_val = ImageNetValidation(transforms_inference)
 
     scaler = GradScaler(enabled=args.fp16_precision)
 
@@ -75,10 +81,9 @@ def train_clip(args):
         epoch_loss = 0.0
         epoch_images_loss = 0.0
         epoch_texts_loss = 0.0
-        progress_bar = tqdm(train_loader,
-                            desc=f"Epoch {epoch+1}/{args.num_epochs}")
+        progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.num_epochs}", total=steps_per_epcoch)
         for step, (batch) in enumerate(progress_bar):
-            batch = {k: v.to(device) for k, v in batch.items()}
+            batch = {k: v.to(device) for k, v in batch.items() if k in ['input_ids', 'attention_mask', 'image']}
 
             with autocast(enabled=args.fp16_precision):
                 logits = model(**batch)
@@ -108,7 +113,7 @@ def train_clip(args):
                 f"Total Loss: {avg_loss:.4f} |"
                 f"Images Loss: {ep_images_loss:.6f} |"
                 f"Texts Loss: {ep_texts_loss:.6f} |"
-                f"Lr: {current_lr:.6f}")
+                f"Lr: {current_lr:.8f}")
 
             global_step += 1
             if global_step % args.log_every_n_steps == 0:
@@ -124,10 +129,13 @@ def train_clip(args):
                 torch.save(model.state_dict(),
                            f"{args.save_model_dir}/clip_model.pth")
 
-            if global_step % (args.log_every_n_steps * 6) == 0:
+            if global_step % (args.log_every_n_steps * 10) == 0:
                 validate(model, val_loader, device)
+            
+            if args.imagenet_eval and global_step % args.imagenet_eval_steps == 0:
+                imgnet_val.evaluate(model)
 
-                lr_scheduler.step(metrics=ep_loss)
+            lr_scheduler.step()
 
 
 def validate(model, val_loader, device):

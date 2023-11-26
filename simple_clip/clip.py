@@ -1,5 +1,4 @@
 import torch
-
 import torch.nn.functional as F
 
 from simple_clip.utils import get_feature_size
@@ -44,8 +43,8 @@ class CLIP(torch.nn.Module):
 
     def extract_image_features(self, images):
         image_features = self.image_encoder(images)
-        return self.projection_head(image_features)
+        return F.normalize(self.projection_head(image_features), dim=-1)
 
     def extract_text_features(self, input_ids, attention_mask):
         text_features = self.text_encoder(input_ids, attention_mask)
-        return text_features
+        return F.normalize(text_features)

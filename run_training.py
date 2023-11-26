@@ -9,7 +9,7 @@ parser.add_argument('--dataset_path',
 parser.add_argument('--dataset_name',
                     default='coco',
                     help='Dataset name',
-                    choices=['textcap', 'coco', "sbucaptions"])
+                    choices=['textcap', 'coco', "sbucaptions", "combined", "yfcc15m"])
 parser.add_argument(
     '--image_encoder_name',
     default='resnet50',
@@ -42,6 +42,13 @@ parser.add_argument('-wd', '--weight_decay', default=1e-4, type=float)
 parser.add_argument('--fp16_precision',
                     action='store_true',
                     help='Whether to use 16-bit precision for GPU training')
+parser.add_argument('--imagenet_eval',
+                    action='store_true',
+                    help='Whether to evaluate on imagenet validation dataset. Required huggingface imagenet-1k dataset.')
+parser.add_argument('--imagenet_eval_steps',
+                    default=1000,
+                    type=int,
+                    help='Evaluate on imagenet every N steps')
 parser.add_argument('--log_every_n_steps',
                     default=50,
                     type=int,

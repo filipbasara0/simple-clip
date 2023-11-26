@@ -6,12 +6,10 @@ from collections import defaultdict
 from tqdm.auto import tqdm
 from io import BytesIO
 from base64 import b64decode
-import os
 
 np.random.seed(42)
 
 from PIL import Image
-
 
 def get_image_tranforms(image_size=(224, 224)):
     return transforms.Compose([
@@ -25,15 +23,6 @@ def _grayscale_to_rgb(img):
     if img.mode != "RGB":
         return img.convert("RGB")
     return img
-
-
-def get_image_tranforms_aug(image_size=(224, 224)):
-    return transforms.Compose([
-        transforms.RandomResizedCrop(image_size, scale=(0.33, 1.0)),
-        transforms.RandomHorizontalFlip(),
-        transforms.Lambda(_grayscale_to_rgb),
-        transforms.ToTensor()
-    ])
 
 
 class COCODataset(torch.utils.data.Dataset):
@@ -130,6 +119,45 @@ class SBUDataset(torch.utils.data.Dataset):
             for key, value in self.encoded_captions.items()
         }
         instance["image"] = image
+
+        return instance
+
+    def __len__(self):
+        return len(self.data)
+    
+
+# coco + textcap + sbucaptions
+class CombinedDataset(torch.utils.data.Dataset):
+
+    def __init__(self,
+                 data,
+                 tokenizer,
+                 transforms,
+                 shuffle_captions=True):
+
+        self.tokenizer = tokenizer
+
+        self.data = data
+        self.transforms = transforms
+        self.shuffle_captions = shuffle_captions
+
+    def __getitem__(self, idx):
+        row = self.data[idx]
+        image, captions = row["image"], row["caption"]
+
+        if self.shuffle_captions:
+            caption = np.random.choice(captions)
+        else:
+            caption = captions[0]
+        encoded_caption = self.tokenizer(caption,
+                                    padding="max_length",
+                                    truncation=True,
+                                    max_length=100)
+        instance = {
+            key: torch.tensor(value)
+            for key, value in encoded_caption.items()
+        }
+        instance["image"] = self.transforms(image)
 
         return instance
 
