@@ -21,6 +21,8 @@ ImageNet results surpassed the [zero-shot scaling trend](https://github.com/mlfo
 
 Trained CLIP model can be found [here](https://drive.google.com/file/d/1UnakTzwVYE0x2A6rPNaK2OhypVBOM1zI/view?usp=sharing).
 
+The `yfcc7m + coco + sbucaptions` dataset has around 8M samples in total, where 7M comes from `yfcc7m`, 810k from `sbucaptions` and 110k from `coco`.
+
 Links to notebooks with [ImageNet](https://github.com/filipbasara0/simple-clip/blob/main/notebooks/zero-shot-imagenet1k.ipynb) and [STL](https://github.com/filipbasara0/simple-clip/blob/main/notebooks/zero-shot-stl.ipynb) results.
 
 # Usage
