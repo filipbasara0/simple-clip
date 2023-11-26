@@ -48,7 +48,7 @@ def get_dataset(dataset_name,
                                 transforms=transforms,
                                 image_key="image",
                                 text_key="caption")
-    elif dataset_name == "yfcc15m":
+    elif dataset_name == "yfcc7m":
         def prepare_data(x):
             caption = x["txt"]
             encoded_caption =  tokenizer(caption,
@@ -65,10 +65,10 @@ def get_dataset(dataset_name,
             
             return instance
         
-        dataset = wds.WebDataset([f"{dataset_path}/yfcc15m/{i:05d}.tar" for i in range(1538)], shardshuffle=True, cache_dir=f"{dataset_path}/yfcc15m_training_cache")
+        dataset = wds.WebDataset([f"{dataset_path}/yfcc7m/{i:05d}.tar" for i in range(1538)], shardshuffle=True, cache_dir=f"{dataset_path}/yfcc7m_training_cache")
         dataset = dataset.shuffle(1000, initial=100).decode("pil").map(prepare_data)
         return dataset
-    raise Exception(f"Invalid dataset name {dataset_name} - options are [coco, sbucaptions, combined, yfcc15m]")
+    raise Exception(f"Invalid dataset name {dataset_name} - options are [coco, sbucaptions, combined, yfcc7m]")
 
 
 def get_image_encoder(model_name):

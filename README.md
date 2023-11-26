@@ -24,11 +24,11 @@ Supported datasets are textcap, coco, sbucaptions and yfcc7m.
 ### Examples
 `yfcc7m` CLIP was trained with this command (around 7M samples):
 
-`python run_training.py --dataset_name yfcc7m --num_epochs 3 --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
+`python run_training.py --dataset_name yfcc7m --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
 
 Combined `coco + textcaptions + sbucaptions` CLIP was trained using (around 1M samples):
 
-`python run_training.py --dataset_name combined --num_epochs 3 --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
+`python run_training.py --dataset_name combined --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
 
 
 ### Detailed options
@@ -40,7 +40,7 @@ options:
   -h, --help            show this help message and exit
   --dataset_path DATASET_PATH
                         Path where datasets will be saved
-  --dataset_name {textcap,coco,sbucaptions,combined,yfcc15m}
+  --dataset_name {textcap,coco,sbucaptions,combined,yfcc7m}
                         Dataset name
   --image_encoder_name {resnet18,resnet50,efficientnet}
                         image model architecture: resnet18, resnet50 or efficientnet (default: resnet50)

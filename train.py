@@ -48,7 +48,7 @@ def train_clip(args):
     ds = get_dataset(args.dataset_name,
                      args.dataset_path,
                      transforms=transforms_inference)
-    if args.dataset_name == "yfcc15m":
+    if args.dataset_name == "yfcc7m":
         train_loader = wds.WebLoader(ds, num_workers=2, batch_size=args.batch_size)
         # hardcoded for batch_size = 256 :/
         steps_per_epcoch = 28630
