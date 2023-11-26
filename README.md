@@ -10,7 +10,7 @@ Simple implementation of [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive L
 
 All experiments used ResNet50 and Distill BERT as respectively image and text encoders. Models were first trained on smaller datasets, such as COCO to validate the approach. Later on, they were trained on combined COCO and sbucaptions data and a yfcc7m subset.
 
-Models were evaluating in zero-shot fashion, where text queries were constructed as "a photo of {label_name}". For ImageNet, we used the 50k validation dataset.
+Models were evaluated in zero-shot fashion, where text queries were constructed as "a photo of {label_name}". For ImageNet, we used the 50k validation dataset.
 
 ImageNet results surpassed the [zero-shot scaling trend](https://github.com/mlfoundations/open_clip/blob/main/docs/LOW_ACC.md), by a few points, signalling a potential for smaller but more diverse and information dense datasets. This is in line with https://arxiv.org/abs/2205.01397, where authors determined that the main contributing factor in model quality and robustness for the CLIP objective are more diverse training distribution. In other words, data quality and diversity >> data quantity.
 
