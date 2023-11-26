@@ -17,7 +17,9 @@ ImageNet results surpassed the [zero-shot scaling trend](https://github.com/mlfo
 | Training Datasets           | Training steps  | Text Encoder            | Image Encoder | Eval dataset | Top1 % |
 |-----------------------------|-----------------|-------------------------|---------------|--------------|--------|
 | yfcc7m + coco + sbucaptions | 57,800          | distilbert-base-uncased | ResNet-50     | STL-10       | 93.75  |
-| yfcc7m + coco + sbucaptions | 57,800          | distilbert-base-uncased | ResNet-50     | ImageNet     | 34.61  |
+| yfcc7m + coco + sbucaptions | 57,800          | distilbert-base-uncased | ResNet-50     | ImageNet     | 36.47  |
+
+Trained CLIP model can be found [here](https://drive.google.com/file/d/1UnakTzwVYE0x2A6rPNaK2OhypVBOM1zI/view?usp=sharing).
 
 
 # Usage
