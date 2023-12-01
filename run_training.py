@@ -28,7 +28,7 @@ parser.add_argument('-save_model_dir',
                     default='./models',
                     help='Path where models')
 parser.add_argument('--num_epochs',
-                    default=3,
+                    default=2,
                     type=int,
                     help='Number of epochs for training')
 parser.add_argument('--image_size', default=224, type=int, help='Image size')

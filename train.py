@@ -41,7 +41,6 @@ def train_clip(args):
     optimizer = torch.optim.Adam(list(model.parameters()),
                                  lr=args.learning_rate,
                                  weight_decay=args.weight_decay)
-    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=60000, eta_min=1e-8)
 
     transforms_inference = get_image_tranforms(
         (args.image_size, args.image_size))
@@ -50,8 +49,8 @@ def train_clip(args):
                      transforms=transforms_inference)
     if args.dataset_name == "yfcc7m":
         train_loader = wds.WebLoader(ds, num_workers=2, batch_size=args.batch_size)
-        # hardcoded for batch_size = 256 :/
-        steps_per_epcoch = 28630
+        # hardcoded for num images = 7329280 :/
+        steps_per_epcoch = 7329280 // args.batch_size
     else:
         train_loader = DataLoader(ds,
                               batch_size=args.batch_size,
@@ -59,6 +58,9 @@ def train_clip(args):
                               drop_last=True,
                               shuffle=True)
         steps_per_epcoch = len(train_loader)
+
+    tmax = args.num_epochs * steps_per_epcoch + steps_per_epcoch // 4
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=(tmax), eta_min=1e-8)
 
     # Always use coco val dataset for standardization purposes
     ds_val = get_dataset("coco",

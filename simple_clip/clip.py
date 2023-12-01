@@ -33,18 +33,15 @@ class CLIP(torch.nn.Module):
             torch.nn.Linear(mlp_in_dim, mlp_out_dim, bias=False))
 
     def forward(self, image, input_ids, attention_mask):
-        image_features = self.image_encoder(image)
-        image_features = self.projection_head(image_features)
-        text_features = self.text_encoder(input_ids, attention_mask)
-
+        image_features = self.extract_image_features(image)
+        text_features = self.extract_text_features(input_ids, attention_mask)
         # logits per image
         logits = image_features @ text_features.t()
         return logits
 
     def extract_image_features(self, images):
         image_features = self.image_encoder(images)
-        return F.normalize(self.projection_head(image_features), dim=-1)
+        return self.projection_head(image_features)
 
     def extract_text_features(self, input_ids, attention_mask):
-        text_features = self.text_encoder(input_ids, attention_mask)
-        return F.normalize(text_features)
+        return self.text_encoder(input_ids, attention_mask)
