@@ -28,12 +28,9 @@ Links to notebooks with [ImageNet](https://github.com/filipbasara0/simple-clip/b
 # Usage
 
 ### Instalation
-To setup the code, clone the repository, optionally create a venv and install requirements:
-
-1. `git clone git@github.com:filipbasara0/simple-clip.git`
-2. create virtual environment: `virtualenv -p python3.10 env`
-3. activate virtual environment: `source env/bin/activate`
-4. install requirements: `pip install -r requirements.txt`
+```bash
+$ pip install simple-clip
+```
 
 Code currently supports ResNet18, ResNet50 and an experimental version of the EfficientNet model as image encoders. Resnet50 was used in all experiments as the image encoder.
 Distill BERT (`distilbert-base-uncased`) was used as the text encoder in all experiments.
@@ -43,16 +40,16 @@ Supported datasets are textcap, coco, sbucaptions and yfcc7m.
 ### Examples
 `yfcc7m` CLIP was trained with this command (around 7M samples):
 
-`python run_training.py --dataset_name yfcc7m --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
+`train_clip --dataset_name yfcc7m --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
 
 Combined `coco + textcaptions + sbucaptions` CLIP was trained using (around 1M samples):
 
-`python run_training.py --dataset_name combined --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
+`train_clip --dataset_name combined --fp16_precision --batch_size 256  --log_every_n_steps 50 --image_size 224 --learning_rate 1e-4 --imagenet_eval`
 
 
 ### Detailed options
 Once the code is setup, run the following command with optinos listed below:
-`python run_training.py [args...]⬇️`
+`train_clip [args...]⬇️`
 
 ```
 options:
