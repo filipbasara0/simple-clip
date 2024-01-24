@@ -7,7 +7,7 @@ from tqdm.auto import tqdm
 from torchinfo import summary
 import webdataset as wds
 
-from simple_clip import CLIP, clip_loss
+from simple_clip import CLIP, contrastive_loss, siglip_loss
 
 from simple_clip.utils import accuracy, get_dataset, get_image_encoder, get_text_encoder
 from simple_clip.custom_datasets.clip_datasets import get_image_tranforms
@@ -81,16 +81,16 @@ def train_clip(args):
     total_loss = 0.0
     for epoch in range(args.num_epochs):
         epoch_loss = 0.0
-        epoch_images_loss = 0.0
-        epoch_texts_loss = 0.0
         progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.num_epochs}", total=steps_per_epcoch)
         for step, (batch) in enumerate(progress_bar):
             batch = {k: v.to(device) for k, v in batch.items() if k in ['input_ids', 'attention_mask', 'image']}
 
             with autocast(enabled=args.fp16_precision):
                 logits = model(**batch)
-                loss_images, loss_texts = clip_loss(logits)
-                loss = (loss_images + loss_texts) / 2
+                if args.use_siglip:
+                    loss = siglip_loss(logits)
+                else:
+                    loss = contrastive_loss(logits)
 
             optimizer.zero_grad()
             scaler.scale(loss).backward()
@@ -102,19 +102,12 @@ def train_clip(args):
             avg_loss = total_loss / (global_step + 1)
             ep_loss = epoch_loss / (step + 1)
 
-            epoch_images_loss += loss_images.item()
-            ep_images_loss = epoch_images_loss / (step + 1)
-            epoch_texts_loss += loss_texts.item()
-            ep_texts_loss = epoch_texts_loss / (step + 1)
-
             current_lr = optimizer.param_groups[0]['lr']
             progress_bar.set_description(
                 f"Epoch {epoch+1}/{args.num_epochs} | "
                 f"Step {global_step+1} | "
                 f"Epoch Loss: {ep_loss:.4f} |"
                 f"Total Loss: {avg_loss:.4f} |"
-                f"Images Loss: {ep_images_loss:.6f} |"
-                f"Texts Loss: {ep_texts_loss:.6f} |"
                 f"Lr: {current_lr:.8f}")
 
             global_step += 1

@@ -57,6 +57,9 @@ parser.add_argument('--ckpt_path',
                     default=None,
                     type=str,
                     help='Specify path to clip_model.pth to resume training')
+parser.add_argument('--use_siglip',
+                    action='store_true',
+                    help='Whether to use siglip loss')
 
 
 def main():

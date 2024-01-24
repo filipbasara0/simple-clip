@@ -6,6 +6,8 @@ Simple implementation of [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive L
 # CLIP
 [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive Language-Image Pretraining) by OpenAI is a model that unifies text and image understanding through a contrastive learning approach. It employs two neural networks, one for image processing and another for text processing, which are jointly trained on a large dataset of images and their corresponding textual descriptions. This training enables the model to understand and link visual content with natural language. CLIP's distinctive feature is its zero-shot learning capability, allowing it to generalize across various visual tasks without task-specific training, solely based on textual prompts. This makes it highly adaptable for diverse applications in AI, from image classification to complex visual reasoning tasks.
 
+Also has a support for the sigmoid pairwise loss, from the [SigLIP](https://arxiv.org/abs/2303.15343) paper. Using this loss, the model seems to converge slower, but eventually reaches similar results as the contrastive loss. To use the SigLIP loss, specify `-- use_siglip` when running the `train_clip` command.
+
 # Results
 
 All experiments used ResNet50 and Distill BERT as respectively image and text encoders. Models were first trained on smaller datasets, such as COCO to validate the approach. Later on, they were trained on combined COCO and sbucaptions data and a yfcc7m subset.
@@ -80,6 +82,7 @@ options:
                         Log every n steps
   --ckpt_path CKPT_PATH
                         Specify path to relic_model.pth to resume training
+  --use_siglip          Whether to use the SigLIP loss
 ```
 
 # Citation
@@ -89,6 +92,15 @@ options:
       author={Alec Radford and Jong Wook Kim and Chris Hallacy and Aditya Ramesh and Gabriel Goh and Sandhini Agarwal and Girish Sastry and Amanda Askell and Pamela Mishkin and Jack Clark and Gretchen Krueger and Ilya Sutskever},
       year={2021},
       eprint={2103.00020},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{zhai2023sigmoid,
+      title={Sigmoid Loss for Language Image Pre-Training}, 
+      author={Xiaohua Zhai and Basil Mustafa and Alexander Kolesnikov and Lucas Beyer},
+      year={2023},
+      eprint={2303.15343},
       archivePrefix={arXiv},
       primaryClass={cs.CV}
 }

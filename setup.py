@@ -13,7 +13,7 @@ def read_long_description():
 setup(
     name = 'simple-clip',
     packages = find_packages(exclude=['notebooks']),
-    version = '0.1.0',
+    version = '0.2.0',
     license='MIT',
     description = 'A minimal, but effective implementation of CLIP (Contrastive Language-Image Pretraining) in PyTorch',
     author = 'Filip Basara',

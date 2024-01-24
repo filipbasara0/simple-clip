@@ -1,1 +1,1 @@
-from simple_clip.clip import CLIP, clip_loss
+from simple_clip.clip import CLIP, contrastive_loss, siglip_loss
