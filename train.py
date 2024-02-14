@@ -24,9 +24,14 @@ torch.cuda.manual_seed(SEED)
 def train_clip(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    if not args.use_siglip:
+        init_tau, init_b = np.log(5), 0
+    else:
+        init_tau, init_b = np.log(10), -10
+
     image_encoder = get_image_encoder(args.image_encoder_name)
     text_encoder = get_text_encoder(args.text_encoder_name)
-    model = CLIP(image_encoder, text_encoder)
+    model = CLIP(image_encoder, text_encoder, init_tau=init_tau, init_b=init_b)
 
     img = torch.rand(1, 3, args.image_size, args.image_size)
     txt = torch.randint(high=20000, size=(1, 100))
@@ -108,6 +113,8 @@ def train_clip(args):
                 f"Step {global_step+1} | "
                 f"Epoch Loss: {ep_loss:.4f} |"
                 f"Total Loss: {avg_loss:.4f} |"
+                f"Temp: {model.t_prime.exp().item():.3f} |"
+                f"Bias: {model.b.item():.3f} |"
                 f"Lr: {current_lr:.8f}")
 
             global_step += 1
