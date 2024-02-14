@@ -1,5 +1,5 @@
 # simple-clip
-Simple implementation of [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive Language-Image Pretraining) in PyTorch.
+Simple implementation of [CLIP](https://arxiv.org/abs/2103.00020) (Contrastive Language-Image Pretraining) in PyTorch. Includes the Sigmoid Loss for Language Image Pre-Training.
 
 <img width="1099" alt="3d5d1009-6e3d-4570-8fd9-ee8f588003e7" src="https://github.com/filipbasara0/simple-clip/assets/29043871/27e708ac-0ced-4382-bcc4-e0db5fc2d115">
 
